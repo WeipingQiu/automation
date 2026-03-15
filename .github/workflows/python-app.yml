@@ -59,10 +59,6 @@ jobs:
 
     - name: Deploy application
       run: |
-        echo "Cleaning up Kubernetes deployment and service..."
-        kubectl delete deployment python-app --ignore-not-found
-        kubectl delete service python-app --ignore-not-found
-        
         echo "creating new docker image..."
         kubectl create deployment python-app \
           --image=docker.io/qiuweiping/python_application:${{ github.sha }} \

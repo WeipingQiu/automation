@@ -88,6 +88,8 @@ jobs:
           kubectl logs $POD_NAME || true
           sleep 5
         done
+    - name: Final Pod status
+      run: |
         kubectl describe pod -l app=python-app  
         kubectl get pods
         kubectl get services

@@ -75,6 +75,7 @@ jobs:
 
     - name: Verify Pod status
       run: |
+        echo "getting pods and services ...."
         kubectl get pods
         kubectl get services
         

@@ -72,7 +72,7 @@ jobs:
     - name: Verify Pod status
       run: |
         echo "getting pods and services ....."
-        sleep 10
+        sleep 5
         kubectl get pods
         kubectl get services
         

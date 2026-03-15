@@ -82,6 +82,6 @@ jobs:
     - name: Cleanup Kubernetes
       if: always()
       run: |
-        echo "Cleaning up Kubernetes deployment and service...."
+        echo "Cleaning up Kubernetes deployment and service ...."
         kubectl delete deployment python-app --ignore-not-found
         kubectl delete service python-app --ignore-not-found

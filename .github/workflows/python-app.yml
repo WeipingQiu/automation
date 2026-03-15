@@ -60,9 +60,8 @@ jobs:
     - name: Deploy application
       run: |
         echo "Cleaning up Kubernetes deployment and service..."
-        POD_NAME=$(kubectl get pod -l app=python-app -o jsonpath="{.items[0].metadata.name}")
-        kubectl delete deployment $POD_NAME --ignore-not-found
-        kubectl delete service $POD_NAME --ignore-not-found
+        kubectl delete deployment python-app --ignore-not-found
+        kubectl delete service python-app --ignore-not-found
         
         echo "creating new docker image..."
         kubectl create deployment python-app \
@@ -98,6 +97,5 @@ jobs:
       if: always()
       run: |
         echo "Cleaning up Kubernetes deployment and service..."
-        POD_NAME=$(kubectl get pod -l app=python-app -o jsonpath="{.items[0].metadata.name}")
-        kubectl delete deployment $POD_NAME --ignore-not-found
-        kubectl delete service $POD_NAME --ignore-not-found
+        kubectl delete deployment python-app --ignore-not-found
+        kubectl delete service python-app --ignore-not-found

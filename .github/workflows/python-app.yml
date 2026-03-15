@@ -84,7 +84,7 @@ jobs:
           fi
           echo "Pod not ready yet, sleeping 5s..."
           POD_NAME=$(kubectl get pod -l app=python-app -o jsonpath="{.items[0].metadata.name}")
-          kubectl describe pod $POD_NAME
+          # kubectl describe pod $POD_NAME
           kubectl logs $POD_NAME || true
           sleep 5
         done

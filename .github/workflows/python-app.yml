@@ -46,18 +46,22 @@ jobs:
         dockerfile: Dockerfile.ci
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+        tag: ${{ github.sha }}
 
     # kubernetes
-    - name: Set up kubectl
+    - name: Install kubectl
       uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
 
-    - name: Configure Kubernetes credentials
+    - name: Setup kubeconfig
       run: |
-        mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
     - name: Deploy to Kubernetes
       run: |
         kubectl set image deployment/python-app \
         python-app=docker.io/qiuweiping/python_application:${{ github.sha }}
+
         kubectl rollout status deployment/python-app

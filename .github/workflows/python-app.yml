@@ -1,0 +1,103 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Test with pytest
+      run: |
+        pytest
+
+    - name: Build and Push Docker Image
+      uses: mr-smithers-excellent/docker-build-push@v6
+      with:
+        image: qiuweiping/python_application
+        registry: docker.io
+        dockerfile: Dockerfile.ci
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        tags: latest,${{ github.sha }}
+
+    # kubernetes
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Create Kubernetes cluster
+      uses: helm/kind-action@v1
+
+    - name: Deploy application
+      run: |
+        echo "Cleaning up Kubernetes deployment and service..."
+        kubectl delete deployment python-app --ignore-not-found
+        kubectl delete service python-app --ignore-not-found
+        
+        echo "creating new docker image..."
+        kubectl create deployment python-app \
+          --image=docker.io/qiuweiping/python_application:${{ github.sha }} \
+          || kubectl set image deployment/python-app python-app=docker.io/qiuweiping/python_application:${{ github.sha }}
+
+        kubectl expose deployment python-app \
+          --type=NodePort \
+          --port=80 \
+          --target-port=5000
+
+    - name: Verify deployment
+      run: |
+        echo "Waiting for python-app pod to be ready..."
+        for i in {1..30}; do
+          STATUS=$(kubectl get pod -l app=python-app -o jsonpath="{.items[0].status.containerStatuses[0].ready}")
+          if [ "$STATUS" == "true" ]; then
+            echo "Pod is ready!"
+            break
+          fi
+          echo "Pod not ready yet, sleeping 5s..."
+          POD_NAME=$(kubectl get pod -l app=python-app -o jsonpath="{.items[0].metadata.name}")
+          # kubectl describe pod $POD_NAME
+          kubectl logs $POD_NAME || true
+          kubectl get pods
+          kubectl get services
+          sleep 5
+        done
+    - name: Final Pod status
+      run: |
+        kubectl get pods
+        kubectl get services
+        
+    - name: Cleanup Kubernetes
+      if: always()
+      run: |
+        echo "Cleaning up Kubernetes deployment and service...."
+        kubectl delete deployment python-app --ignore-not-found
+        kubectl delete service python-app --ignore-not-found

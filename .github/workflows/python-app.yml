@@ -72,16 +72,15 @@ jobs:
       run: |
         echo "Waiting for python-app pod to be ready..."
         for i in {1..30}; do
-          POD_NAME=$(kubectl get pod -l app=python-app -o jsonpath="{.items[0].metadata.name}")
-          STATUS=$(kubectl get pod "$POD_NAME" -o jsonpath="{.status.containerStatuses[0].ready}")
-          
+          STATUS=$(kubectl get pod -l app=python-app -o jsonpath="{.items[0].status.containerStatuses[0].ready}")
           if [ "$STATUS" == "true" ]; then
-              echo "Pod $POD_NAME is ready!"
-              break
+            echo "Pod is ready!"
+            break
           fi
-          
-          echo "Pod $POD_NAME not ready yet, sleeping 5s..."
-          kubectl logs "$POD_NAME"
+          echo "Pod not ready yet, sleeping 5s..."
+          POD_NAME=$(kubectl get pod -l app=python-app -o jsonpath="{.items[0].metadata.name}")
+          kubectl describe pod $POD_NAME
+          kubectl logs $POD_NAME || true
           sleep 5
         done
         kubectl describe pod -l app=python-app  

@@ -59,7 +59,7 @@ jobs:
     - name: Deploy application
       run: |
         kubectl create deployment python-app \
-        --image=docker.io/qiuweiping/python_application:${{ github.sha }}
+        --image=docker.io/qiuweiping/python_application::latest
 
         kubectl expose deployment python-app \
         --type=NodePort \

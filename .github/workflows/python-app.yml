@@ -60,12 +60,13 @@ jobs:
     - name: Deploy application
       run: |
         kubectl create deployment python-app \
-        --image=docker.io/qiuweiping/python_application:${{ github.sha }}
+          --image=docker.io/qiuweiping/python_application:${{ github.sha }} \
+          || kubectl set image deployment/python-app python-app=docker.io/qiuweiping/python_application:${{ github.sha }}
 
         kubectl expose deployment python-app \
-        --type=NodePort \
-        --port=80 \
-        --target-port=5000
+          --type=NodePort \
+          --port=80 \
+          --target-port=5000
 
     - name: Verify deployment
       run: |

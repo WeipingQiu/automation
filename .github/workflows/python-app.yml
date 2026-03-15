@@ -68,5 +68,6 @@ jobs:
 
     - name: Verify deployment
       run: |
+        kubectl describe pod python-app
         kubectl get pods
         kubectl get services

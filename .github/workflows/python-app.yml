@@ -68,6 +68,7 @@ jobs:
 
     - name: Verify deployment
       run: |
+        kubectl rollout status deployment/python-app --timeout=120s
         kubectl describe pod python-app
         kubectl get pods
         kubectl get services

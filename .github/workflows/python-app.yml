@@ -90,6 +90,5 @@ jobs:
         done
     - name: Final Pod status
       run: |
-        kubectl describe pod -l app=python-app  
         kubectl get pods
         kubectl get services

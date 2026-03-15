@@ -73,24 +73,7 @@ jobs:
           --port=80 \
           --target-port=5000
 
-    - name: Verify deployment
-      run: |
-        echo "Waiting for python-app pod to be ready..."
-        for i in {1..30}; do
-          STATUS=$(kubectl get pod -l app=python-app -o jsonpath="{.items[0].status.containerStatuses[0].ready}")
-          if [ "$STATUS" == "true" ]; then
-            echo "Pod is ready!"
-            break
-          fi
-          echo "Pod not ready yet, sleeping 5s..."
-          POD_NAME=$(kubectl get pod -l app=python-app -o jsonpath="{.items[0].metadata.name}")
-          # kubectl describe pod $POD_NAME
-          kubectl logs $POD_NAME || true
-          kubectl get pods
-          kubectl get services
-          sleep 5
-        done
-    - name: Final Pod status
+    - name: Verify Pod status
       run: |
         kubectl get pods
         kubectl get services

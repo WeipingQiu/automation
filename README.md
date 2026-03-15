@@ -2,6 +2,7 @@
 
 
 gitHub
+https://github.com/WeipingQiu/automation/blob/WeipingQiu-automation-CI
 
 git branch -all
 
@@ -12,6 +13,8 @@ git push -u origin WeipingQiu-automation-CI
 
 
 Docker hub
+https://hub.docker.com/repository/docker/qiuweiping/python_application/general
+
 qiuweiping/515...
 
 docker push qiuweiping/python_application:tagname

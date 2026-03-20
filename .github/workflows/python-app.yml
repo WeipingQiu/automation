@@ -59,7 +59,7 @@ jobs:
 
     - name: Deploy application
       run: |
-        echo "creating new docker image..."
+        echo "creating new docker image...."
         kubectl create deployment python-app \
           --image=docker.io/qiuweiping/python_application:${{ github.sha }} \
           || kubectl set image deployment/python-app python-app=docker.io/qiuweiping/python_application:${{ github.sha }}
